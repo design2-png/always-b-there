@@ -1,0 +1,7 @@
+{
+  "name": "always-b-there",
+  "private": true,
+  "description": "Backbone 十週年 Always B There 線上故事牆徵集活動",
+  "engines": { "node": ">=20" },
+  "scripts": { "dev": "vercel dev", "test": "node test/api.test.js" }
+}
