@@ -150,7 +150,9 @@ $("lbShare").onclick = async () => {
 document.querySelectorAll('a[href="#privacy"]').forEach((a) => a.addEventListener("click", () => { $("privacy").open = true; }));
 
 /* ---------- INTRO（滿版，播完才進主頁） ---------- */
-const INTRO_IMGS = [1, 2, 3, 4, 5].map((n) => asset(`/assets/intro/p${n}.jpg`));
+/* 開場：直式 6 張（p1–p6）給翻頁用，橫式 12 張（r1–r12）給文字列用，每張只出現一次 */
+const INTRO_IMGS = [1, 2, 3, 4, 5, 6].map((n) => asset(`/assets/intro/p${n}.jpg`));
+const ROW_IMGS = Array.from({ length: 12 }, (_, i) => asset(`/assets/intro/r${i + 1}.jpg`));
 let introT = [];
 function playIntro() {
   if (reduce) { endIntro(true); return; }
@@ -160,14 +162,14 @@ function playIntro() {
   hmTitleOff(); clearPile();
   const W = innerWidth, sc = W < 640 ? .42 : Math.min(1, W / 1440);
   const XL = [-180, -160, -140, -98, 20, 410], XE = [-600, -360, -120, 120, 360, 600];
-  $("fanStage").innerHTML = XL.map((x, i) => `<img src="${INTRO_IMGS[i % 5]}" alt="" style="--x:${Math.round(x * sc)}px;--xe:${Math.round(XE[i] * sc)}px;--d:${(i * .06).toFixed(2)}s;z-index:${10 - i}">`).join("");
+  $("fanStage").innerHTML = XL.map((x, i) => `<img src="${INTRO_IMGS[i % 6]}" alt="" style="--x:${Math.round(x * sc)}px;--xe:${Math.round(XE[i] * sc)}px;--d:${(i * .06).toFixed(2)}s;z-index:${10 - i}">`).join("");
   $("rows").className = "rows"; $("introSec").textContent = "01 / 線 → 面";
   requestAnimationFrame(() => $("fan").classList.add("on"));
   at(3400, () => {
     $("introSec").textContent = "02 / 字 × 線";
     const mk = (txt, cls, imgs) => { let h = ""; for (let i = 0; i < 6; i++) h += `<span>${txt}</span><i class="cell" style="background-image:url(${imgs[i % imgs.length]});--i:${(i * .12).toFixed(2)}s"></i>`; return `<div class="row ${cls}">${h}</div>`; };
-    const P = INTRO_IMGS;
-    $("rows").innerHTML = mk("挺好的", "", [P[0], P[2], P[4]]) + mk("10 YEARS", "en", [P[1], P[3], P[0]]) + mk("十年", "", [P[3], P[0], P[2]]) + mk("挺好的", "", [P[2], P[1], P[4]]) + '<div class="veil"></div>';
+    const R = ROW_IMGS;
+    $("rows").innerHTML = mk("挺好的", "", R.slice(0, 3)) + mk("10 YEARS", "en", R.slice(3, 6)) + mk("十年", "", R.slice(6, 9)) + mk("挺好的", "", R.slice(9, 12)) + '<div class="veil"></div>';
     $("rows").classList.add("on"); $("fan").classList.remove("on");
   });
   at(5000, () => { $("introSec").textContent = "03 / 線 → 照片"; $("rows").classList.add("open"); });

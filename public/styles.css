@@ -63,7 +63,7 @@ button{font:inherit;color:inherit}
 .row.en{font-family:"Sora",sans-serif;font-weight:800;letter-spacing:-.02em}
 .row span{padding:0 .22em}
 .row .cell{display:inline-block;flex:0 0 auto;width:2px;height:.92em;margin:0 .2em;background:#8F908E center/cover no-repeat;filter:grayscale(1) contrast(1.12);transition:width .9s var(--ease) var(--i,0s)}
-.rows.open .row .cell{width:1.9em}
+.rows.open .row .cell{width:1.23em}
 .rows.on .row{animation:slide 3.6s linear both}
 .rows.on .row:nth-child(even){animation-name:slideR}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-22%)}}
