@@ -81,13 +81,15 @@ button{font:inherit;color:inherit}
 .nav .wrap{min-height:calc(var(--logo-h) * 3);display:flex;align-items:center;justify-content:space-between;gap:16px}
 /* 標誌淨空：以弧線高度（--logo-h）為單位，上下左右各留一個單位 */
 :root{--logo-h:30px}
-.brand{display:flex;align-items:center;padding:var(--logo-h) var(--logo-h) var(--logo-h) 0;margin-right:var(--logo-h)}
+.brand{display:flex;flex-shrink:0;align-items:center;padding:var(--logo-h) var(--logo-h) var(--logo-h) 0;margin-right:var(--logo-h)}
 .brand .wm{height:var(--logo-h);width:auto}
 .nav nav{display:flex;gap:30px;font-size:14px;letter-spacing:.12em;font-weight:500}
 .nav nav a{padding:6px 0;border-bottom:1px solid transparent;transition:border-color .2s}
 .nav nav a:hover{border-bottom-color:var(--black)}
 .nav nav a.ext{color:var(--mute2)}
-@media (max-width:760px){:root{--logo-h:24px}.nav nav{gap:14px;font-size:12px;letter-spacing:.06em}.nav nav a.ext{display:none}}
+.nav nav a.ext .short{display:none}
+@media (max-width:760px){:root{--logo-h:22px}.nav nav{gap:12px;font-size:11.5px;letter-spacing:.04em}.nav nav a.ext .full{display:none}.nav nav a.ext .short{display:inline}}
+@media (max-width:340px){.nav nav{gap:9px;font-size:11px;letter-spacing:.02em}}
 
 /* ===== HERO ===== */
 .hm{position:relative;height:min(780px,calc(100svh - var(--logo-h) * 3));min-height:600px;background:var(--black);color:#fff;overflow:hidden;isolation:isolate}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Always B There — Backbone 十週年故事牆</title>
+<meta name="description" content="Backbone 十週年「Always B There」故事牆，11/6 開始徵件。">
+<meta property="og:title" content="Always B There — Backbone 十週年故事牆">
+<meta property="og:description" content="這十年，你和 Backbone 的故事。11/6 開始徵件，敬請期待。">
+<meta property="og:image" content="/assets/og.jpg">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&family=Sora:wght@700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--black:#171917;--off:#F1F1F1;--yellow:#E6F832;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--black);color:#fff;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;-webkit-font-smoothing:antialiased}
+.vid{position:fixed;inset:0;z-index:0}
+.vid video,.vid img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;opacity:0;transition:opacity 1.6s ease}
+.vid.on video,.vid.on img{opacity:1}
+.vid::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(23,25,23,.55) 0%,rgba(23,25,23,.05) 35%,rgba(23,25,23,.15) 65%,rgba(23,25,23,.85) 100%)}
+.grid{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:72px 72px}
+.ui{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:max(28px,env(safe-area-inset-top)) clamp(20px,5vw,64px) max(24px,env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.mark{width:clamp(64px,8vw,96px);filter:invert(1)}
+.mono{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.5);text-transform:uppercase}
+.mid{text-align:center;padding:40px 24px;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(23,25,23,.88) 0%,rgba(23,25,23,.6) 45%,rgba(23,25,23,0) 100%);opacity:0;transform:translateY(14px);transition:opacity 1s ease .4s,transform 1s cubic-bezier(.2,.7,.2,1) .4s}
+.on .mid{opacity:1;transform:none}
+.eyebrow{font-size:12px;letter-spacing:.3em;font-weight:500;color:rgba(255,255,255,.7);margin:0 0 14px}
+h1{margin:0;font-family:"Sora",sans-serif;font-weight:800;font-size:clamp(40px,8vw,104px);line-height:1;letter-spacing:-.03em;text-wrap:balance}
+h1 i{font-style:normal;color:var(--yellow)}
+.sub{margin:18px 0 0;font-size:clamp(14px,1.6vw,17px);font-weight:300;letter-spacing:.1em;color:rgba(255,255,255,.75);line-height:1.9}
+.sub b{font-weight:700;color:#fff;border-bottom:3px solid var(--yellow);padding-bottom:1px}
+.cd{display:flex;justify-content:center;gap:clamp(14px,3vw,32px);margin-top:clamp(28px,5vh,48px)}
+.cd div{min-width:3.2ch}
+.cd b{display:block;font-family:"Sora",sans-serif;font-weight:700;font-size:clamp(30px,5vw,56px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cd small{display:block;margin-top:8px;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.5)}
+.bot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.bot a{color:inherit;text-decoration:none}
+.staff{display:flex;align-items:center;gap:10px}
+.staff button{background:none;border:0;color:rgba(255,255,255,.35);font:inherit;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.22em;padding:8px 0;cursor:pointer}
+.staff button:hover{color:#fff}
+.staff form{display:none;align-items:center;gap:8px}
+.staff.open form{display:flex}.staff.open button{display:none}
+.staff input{width:120px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);color:#fff;font:inherit;font-size:14px;letter-spacing:.3em;padding:8px 10px;border-radius:0;outline:none}
+.staff input:focus{border-color:#fff}
+.staff .go{background:#fff;color:var(--black);border:0;font:inherit;font-size:12px;font-weight:700;letter-spacing:.14em;padding:9px 14px;cursor:pointer}
+.bad{color:#ff6b6b;font-size:12px;letter-spacing:.1em}
+@media (min-width:900px){.vid video,.vid img{width:auto;height:100%;left:auto;right:4vw;position:absolute;object-fit:contain;object-position:50% 50%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 28%,#000 78%,transparent),linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 28%,#000 78%,transparent),linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);mask-composite:intersect}.vid::after{background:linear-gradient(90deg,var(--black) 30%,rgba(23,25,23,.35) 55%,rgba(23,25,23,.1) 75%,rgba(23,25,23,.6) 100%)}.mid{text-align:left;padding:0;background:none;max-width:640px}.cd{justify-content:flex-start}.sub br{display:none}}
+@media (max-width:640px){.ui{justify-content:flex-start}.mid{margin-top:auto;padding-top:120px}.bot{margin-top:28px}.vid video,.vid img{object-position:50% 20%}.ui{padding-top:max(20px,env(safe-area-inset-top))}.mono.hide-m{display:none}.cd small{font-size:9px}}
+@media (prefers-reduced-motion:reduce){.mid{transition:none}}
+</style>
+</head>
+<body>
+<div class="vid" id="vid">
+  <video id="v" autoplay muted loop playsinline preload="auto" poster="/assets/teaser.jpg" aria-hidden="true">
+    <source src="/assets/teaser.mp4" type="video/mp4">
+  </video>
+</div>
+<div class="grid"></div>
+
+<div class="ui" id="ui">
+  <div class="top">
+    <img class="mark" src="/assets/mark-10th.svg" alt="Backbone 10th Anniversary">
+    <span class="mono hide-m">Always B There · 2016 — 2026</span>
+  </div>
+
+  <div class="mid">
+    <p class="eyebrow">BACKBONE 十週年 · 線上故事牆</p>
+    <h1>STAY<br>TUNED<i>.</i></h1>
+    <p class="sub">這十年，你和 Backbone 的故事。<br><b>11 / 6</b> 開始徵件，敬請期待。</p>
+    <div class="cd" id="cd" aria-label="倒數">
+      <div><b id="d">--</b><small>DAYS</small></div>
+      <div><b id="h">--</b><small>HRS</small></div>
+      <div><b id="m">--</b><small>MIN</small></div>
+      <div><b id="s">--</b><small>SEC</small></div>
+    </div>
+  </div>
+
+  <div class="bot">
+    <a class="mono" href="https://www.backbone.tw/" target="_blank" rel="noopener">backbone.tw ↗</a>
+    <div class="staff" id="staff">
+      <button type="button" id="staffBtn" aria-label="工作人員登入">STAFF</button>
+      <form action="/unlock" method="get" autocomplete="off">
+        <input type="password" name="code" inputmode="numeric" placeholder="通關密語" aria-label="通關密語" required>
+        <button class="go" type="submit">進入</button>
+        <span class="bad" id="bad" hidden>密語不對</span>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var T = Date.parse("2026-11-06T00:00:00+08:00");
+  var $ = function(id){ return document.getElementById(id); };
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function tick(){
+    var left = Math.max(0, T - Date.now());
+    var s = Math.floor(left / 1000);
+    $("d").textContent = Math.floor(s / 86400);
+    $("h").textContent = pad(Math.floor(s % 86400 / 3600));
+    $("m").textContent = pad(Math.floor(s % 3600 / 60));
+    $("s").textContent = pad(s % 60);
+    if (left === 0) { setTimeout(function(){ location.replace("/"); }, 1500); return; }
+    setTimeout(tick, 1000 - Date.now() % 1000);
+  }
+  tick();
+  var v = $("v"), vid = $("vid");
+  var show = function(){ vid.classList.add("on"); };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { v.removeAttribute("autoplay"); v.pause(); vid.innerHTML = '<img src="/assets/teaser.jpg" alt="">'; show(); }
+  else { v.addEventListener("playing", show, { once: true }); v.addEventListener("loadeddata", show, { once: true }); setTimeout(show, 2500); v.play && v.play().catch(function(){ show(); }); }
+  requestAnimationFrame(function(){ $("ui").classList.add("on"); });
+  var st = $("staff");
+  $("staffBtn").onclick = function(){ st.classList.add("open"); st.querySelector("input").focus(); };
+  if (location.search.indexOf("bad=1") > -1) { st.classList.add("open"); $("bad").hidden = false; history.replaceState(null, "", location.pathname); }
+})();
+</script>
+</body>
+</html>
