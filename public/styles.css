@@ -75,17 +75,19 @@ button{font:inherit;color:inherit}
 
 /* ===== NAV ===== */
 .nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(241,241,241,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{display:flex;align-items:center;gap:16px}
-.brand .wm{height:22px;width:auto}
-.nav nav{display:flex;gap:26px;font-size:13px;letter-spacing:.12em;font-weight:500}
+.nav .wrap{min-height:calc(var(--logo-h) * 3);display:flex;align-items:center;justify-content:space-between;gap:16px}
+/* 標誌淨空：以弧線高度（--logo-h）為單位，上下左右各留一個單位 */
+:root{--logo-h:30px}
+.brand{display:flex;align-items:center;padding:var(--logo-h) var(--logo-h) var(--logo-h) 0;margin-right:var(--logo-h)}
+.brand .wm{height:var(--logo-h);width:auto}
+.nav nav{display:flex;gap:30px;font-size:14px;letter-spacing:.12em;font-weight:500}
 .nav nav a{padding:6px 0;border-bottom:1px solid transparent;transition:border-color .2s}
 .nav nav a:hover{border-bottom-color:var(--black)}
 .nav nav a.ext{color:var(--mute2)}
-@media (max-width:760px){.brand .mono{display:none}.nav nav{gap:14px;font-size:12px;letter-spacing:.06em}.nav nav a.ext{display:none}.brand .wm{height:18px}}
+@media (max-width:760px){:root{--logo-h:24px}.nav nav{gap:14px;font-size:12px;letter-spacing:.06em}.nav nav a.ext{display:none}}
 
 /* ===== HERO ===== */
-.hm{position:relative;height:min(780px,calc(100svh - 64px));min-height:600px;background:var(--black);color:#fff;overflow:hidden;isolation:isolate}
+.hm{position:relative;height:min(780px,calc(100svh - var(--logo-h) * 3));min-height:600px;background:var(--black);color:#fff;overflow:hidden;isolation:isolate}
 .pile{position:absolute;inset:0;touch-action:pan-y}
 .bub{position:absolute;left:0;top:0;transform:translate(-9999px,-9999px);white-space:nowrap;font-size:15px;letter-spacing:.04em;font-weight:500;padding:10px 16px;border-radius:999px;background:#fff;color:var(--black);border:1px solid #fff;will-change:transform;user-select:none;-webkit-user-select:none;cursor:grab}
 .bub:active{cursor:grabbing}
@@ -328,7 +330,7 @@ footer .mono{grid-column:1/-1;color:rgba(255,255,255,.4);border-top:1px solid rg
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
 /* ===== FINAL 修正（企劃 10/2 測試回饋） ===== */
-section[id],main [id="privacy"]{scroll-margin-top:80px}
+section[id],main [id="privacy"]{scroll-margin-top:calc(var(--logo-h, 22px) * 3 + 12px)}
 .sent-help{flex:1 1 100%;margin-top:-4px}
 .drop.has input{pointer-events:none}
 .drop.has img{cursor:grab;touch-action:none}
