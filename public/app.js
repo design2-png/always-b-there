@@ -31,7 +31,9 @@ document.querySelectorAll("[data-cfg]").forEach((el) => { const k = el.dataset.c
 $("ctaNote").textContent = `—— ${E.md} 前參與故事徵集，即有機會獲得萬元購物金。`;
 $("announceLine").textContent = `Backbone 將於 ${CFG.announceDate.replace(/（.）/, "")} 於官方 FB／IG 公布得獎者`;
 [["mainSiteLink", CFG.mainSite], ["fMain", CFG.mainSite], ["fShop", CFG.shopUrl], ["fIg", CFG.igUrl]].forEach(([id, u]) => { $(id).href = u; });
-if (CFG.igPostUrl) $("igPostLink").href = CFG.igPostUrl; else $("igPostLink").replaceWith(document.createTextNode("活動貼文"));
+/* IG 活動貼文：config 有填就連到貼文，還沒填就先連 IG 主頁 */
+document.querySelectorAll(".igpost").forEach((a) => { a.href = CFG.igPostUrl || CFG.igUrl; });
+if (!CFG.igPostUrl) $("goPost").textContent = "前往 Backbone IG ↗";
 $("since").insertAdjacentHTML("beforeend", CFG.years.map((y) => `<option value="${esc(y)}">${esc(y === "忘記了" ? y : y + " 年")}</option>`).join(""));
 $("product").insertAdjacentHTML("beforeend", CFG.products.map((p) => `<option>${esc(p)}</option>`).join(""));
 $("fProd").insertAdjacentHTML("beforeend", CFG.products.map((p) => `<option>${esc(p)}</option>`).join(""));
@@ -49,7 +51,7 @@ const DEMO = [
   { p: "Dyback 04 電動升降桌", title: "一人一組高度", name: "李承翰", since: "2024", img: "g", story: "兩組記憶高度剛好一人一組，按一下就是換班的鈴聲。" },
   { p: "Mamba™", title: "它才八歲", name: "郭欣妤", since: "忘記了", img: "h", story: "搬家師傅問要不要換新的，我說不用，它才八歲。" }
 ];
-const DEMO_SIZE = { a: [560, 373], b: [560, 373], c: [560, 373], d: [520, 347], e: [520, 416], f: [520, 293], g: [293, 520], h: [293, 520] };
+const DEMO_SIZE = { a: [1000, 667], b: [666, 925], c: [668, 848], d: [520, 347], e: [520, 416], f: [520, 293], g: [293, 520], h: [293, 520] };
 
 function imgSrc(s, w = 640) {
   if (s._local) return s._local;
@@ -85,15 +87,22 @@ function applyFilter() {
 function ratio(s) { const r = s.w && s.h ? s.w / s.h : 4 / 3; return Math.min(4 / 3, Math.max(3 / 4, r)).toFixed(3); }
 function renderWall() {
   const list = view.slice(0, shownN);
-  $("wall").innerHTML = list.map((s, i) => `<button class="card${query ? " hit" : ""}" type="button" data-i="${i}">
+  /* 由左到右、由上到下：第 i 則放第 i % 欄數 欄，編號從大到小 */
+  const n = colCount(), cols = Array.from({ length: n }, () => []);
+  list.forEach((s, i) => cols[i % n].push(`<button class="card${query ? " hit" : ""}" type="button" data-i="${i}">
     <div class="ph" style="--ar:${ratio(s)}"><img loading="lazy" decoding="async" src="${esc(imgSrc(s))}" alt="" onload="this.classList.add('ld')"></div>
     <div class="meta"><span class="mono">${esc(shortP(s.p))} · ${pad(s.no)}</span><span>${esc(s.name)}</span></div>
-    <h3>${esc(s.title)}${mineNos.has(s.no) ? '<span class="mine">你的故事</span>' : ""}</h3></button>`).join("");
+    <h3>${esc(s.title)}${mineNos.has(s.no) ? '<span class="mine">你的故事</span>' : ""}</h3></button>`));
+  $("wall").innerHTML = cols.map((c) => `<div class="col">${c.join("")}</div>`).join("");
+  lastCols = n;
   $("empty").hidden = view.length > 0;
   $("more").style.display = view.length > shownN ? "" : "none";
-  const n = stories.length;
-  $("count").textContent = n; $("countMono").textContent = `${n} STORIES`;
+  const total = stories.length;
+  $("count").textContent = total; $("countMono").textContent = `${total} STORIES`;
 }
+let lastCols = 0;
+function colCount() { const w = innerWidth; return w > 1100 ? 4 : w > 760 ? 3 : 2; }
+addEventListener("resize", () => { if (colCount() !== lastCols) renderWall(); });
 const shortP = (p) => String(p || "").replace(/[™®]/g, "").split(" ")[0].toUpperCase();
 $("fProd").addEventListener("change", (e) => { fProd = e.target.value; applyFilter(); });
 let qT; $("q").addEventListener("input", (e) => { clearTimeout(qT); qT = setTimeout(() => { query = e.target.value; applyFilter(); }, 180); });
@@ -112,6 +121,7 @@ function openLb(i) {
   $("lbSince").textContent = s.since === "忘記了" ? "用了好多年" : `${s.since} 起使用`;
   $("lbText").textContent = `這十年，它${s.story}`;
   $("lbPrev").disabled = i === 0; $("lbNext").disabled = i >= view.length - 1;
+  document.querySelector(".lb").classList.toggle("mine", mineNos.has(s.no));
   openOv("lbov", $("lbX"));
   history.replaceState(null, "", `?s=${s.no}${location.hash}`);
 }
@@ -230,7 +240,7 @@ function dropBubble(text, cls) {
   if (!engine) { startPile(); }
   if (!engine) return;
   const d = addBody(text, cls, $("pile").clientWidth / 2, -60, 3); d.classList.add("new"); setTimeout(() => d.classList.remove("new"), 1800);
-  hmTitleOn(); toast("你的那一句，掉進牆裡了");
+  hmTitleOn(); toast("來看看大家的故事吧！");
 }
 addEventListener("resize", () => {
   if (!engine || !window.Matter) return; const M = window.Matter, P = $("pile"), W = P.clientWidth, H = P.clientHeight;
@@ -281,9 +291,27 @@ async function loadPhoto(f) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; c.getContext("2d").drawImage(bmp, 0, 0, w, h);
   const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", .88));
   if (photo?.url) URL.revokeObjectURL(photo.url);
-  photo = { blob, url: URL.createObjectURL(blob), w, h, hash, canvas: c };
-  $("prev").src = photo.url; drop.classList.add("has"); bad("fPhoto", false);
+  photo = { blob, url: URL.createObjectURL(blob), w, h, hash, canvas: c, fx: .5, fy: .5 };
+  $("prev").src = photo.url; $("prev").style.objectPosition = "50% 50%"; drop.classList.add("has"); bad("fPhoto", false);
 }
+/* 拖曳照片調整位置（決定故事卡裁切的重點） */
+drop.addEventListener("click", (e) => { if (drop.classList.contains("has") && !e.target.closest(".swap")) e.preventDefault(); });
+drop.querySelector(".swap").addEventListener("click", (e) => { e.preventDefault(); $("photo").click(); });
+drop.querySelector(".swap").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("photo").click(); } });
+(() => {
+  const im = $("prev"); let st = null;
+  im.addEventListener("pointerdown", (e) => { if (!photo) return; e.preventDefault(); im.setPointerCapture(e.pointerId); im.classList.add("dragging"); st = { x: e.clientX, y: e.clientY, fx: photo.fx, fy: photo.fy }; });
+  im.addEventListener("pointermove", (e) => {
+    if (!st || !photo) return;
+    const box = im.getBoundingClientRect(), r = Math.max(box.width / photo.w, box.height / photo.h);
+    const ox = photo.w * r - box.width, oy = photo.h * r - box.height; /* 可移動的多餘寬高 */
+    if (ox > 1) photo.fx = Math.min(1, Math.max(0, st.fx - (e.clientX - st.x) / ox));
+    if (oy > 1) photo.fy = Math.min(1, Math.max(0, st.fy - (e.clientY - st.y) / oy));
+    im.style.objectPosition = `${(photo.fx * 100).toFixed(1)}% ${(photo.fy * 100).toFixed(1)}%`;
+  });
+  const end = () => { st = null; im.classList.remove("dragging"); };
+  im.addEventListener("pointerup", end); im.addEventListener("pointercancel", end);
+})();
 
 const counters = [["story", "cStory", CFG.limits.story], ["title", "cTitle", CFG.limits.title]];
 counters.forEach(([id, cid, max]) => $(id).addEventListener("input", (e) => {
@@ -293,14 +321,26 @@ counters.forEach(([id, cid, max]) => $(id).addEventListener("input", (e) => {
 $("phone").addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10); });
 ["since", "product"].forEach((id) => { const s = $(id); const f = () => s.classList.toggle("empty", !s.value); s.addEventListener("change", f); f(); });
 
+/* Email 檢查：格式 + 常見網域拼錯 + 頂級網域白名單（例：.coe、gmail.con 會被擋） */
+const TLDS = new Set("com net org edu gov mil int tw jp hk mo cn sg my kr th vn ph id in au nz us ca uk de fr it es nl be ch at se no dk fi ie pt pl cz ru br mx io co me ai app dev tech info biz xyz cc tv asia online site store studio design art life live cloud email page one top vip club pro name mobi icu fun shop work today world space website".split(" "));
+const MAIL_FIX = { "gmail.con": "gmail.com", "gmail.co": "gmail.com", "gmail.cm": "gmail.com", "gmai.com": "gmail.com", "gmial.com": "gmail.com", "gamil.com": "gmail.com", "gmail.com.tw": "gmail.com", "yahoo.con": "yahoo.com", "yahoo.com.t": "yahoo.com.tw", "yaho.com.tw": "yahoo.com.tw", "hotmail.con": "hotmail.com", "hotmai.com": "hotmail.com", "outlook.con": "outlook.com", "icloud.con": "icloud.com", "iclould.com": "icloud.com" };
+function emailProblem(v) {
+  const e = String(v || "").trim().toLowerCase();
+  const m = e.match(/^[a-z0-9._%+-]+@((?:[a-z0-9-]+\.)+)([a-z]{2,})$/);
+  if (!m || e.length > 120 || e.includes("..")) return "Email格式錯誤";
+  const domain = m[1] + m[2];
+  if (MAIL_FIX[domain]) return `是不是 ${e.split("@")[0]}@${MAIL_FIX[domain]}？`;
+  if (!TLDS.has(m[2])) return "Email格式錯誤";
+  return "";
+}
 function bad(id, on, msg) { const f = $(id); f.classList.toggle("bad", !!on); if (msg) { const e = f.querySelector(".err"); if (e) e.textContent = msg; } return !!on; }
 const V = {
   name: () => bad("fName", !$("name").value.trim(), "請填寫"),
   since: () => bad("fSince", !$("since").value, "請選取"),
   product: () => bad("fProduct", !$("product").value, "請選取"),
   story: () => bad("fStory", !$("story").value.trim(), "請填入你的故事"),
-  title: () => bad("fTitle", !$("title").value.trim(), "請填入一句標語"),
-  email: () => bad("fEmail", !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($("email").value.trim()), "Email格式錯誤"),
+  title: () => bad("fTitle", !$("title").value.trim(), "請填入故事標題"),
+  email: () => { const m = emailProblem($("email").value); return bad("fEmail", !!m, m || "Email格式錯誤"); },
   phone: () => bad("fPhone", !/^09\d{8}$/.test($("phone").value), "手機號碼格式錯誤"),
   agree: () => bad("fAgree", !$("agree").checked, "請勾選"),
   photo: () => bad("fPhoto", !photo, "請上傳一張照片")
@@ -360,8 +400,9 @@ $("form").addEventListener("submit", async (e) => {
       if (!sub.ok) { if (sub.j.fields) showServerErrors(sub.j.fields); else toast(sub.j.message || "送出失敗，請再試一次"); window.turnstile?.reset?.(); throw new Error("submit"); }
       no = sub.j.no;
     }
-    const s = { no, p: $("product").value, title: $("title").value.trim(), name: $("name").value.trim(), since: $("since").value, story: $("story").value.trim(), w: photo.w, h: photo.h, img: "", _local: photo.url };
+    const s = { no, p: $("product").value, title: $("title").value.trim(), name: $("name").value.trim(), since: $("since").value, story: $("story").value.trim(), w: photo.w, h: photo.h, img: "", _local: photo.url, fx: photo.fx, fy: photo.fy };
     mineNos.add(no); store.set("abt_mine", [...mineNos]);
+    const meta = store.get("abt_mine_meta") || {}; meta[no] = { fx: photo.fx, fy: photo.fy }; store.set("abt_mine_meta", meta);
     if (MODE === "demo") { const keep = store.get("abt_demo") || []; keep.unshift({ ...s, _local: photo.canvas.toDataURL("image/jpeg", .7) }); store.set("abt_demo", keep.slice(0, 5)); }
     stories.unshift(s); fProd = ""; query = ""; $("fProd").value = ""; $("q").value = ""; applyFilter();
     done(s);
@@ -381,7 +422,7 @@ function done(s) {
   if (reduce) { finish(); } else { throwBubble(title, finish); }
   $("form").reset(); drop.classList.remove("has"); $("cStory").textContent = 0; $("cTitle").textContent = 0;
   ["since", "product"].forEach((id) => $(id).classList.add("empty"));
-  photo = null;
+  $("prev").style.objectPosition = ""; photo = null;
 }
 function throwBubble(text, cb) {
   const r = $("sendBtn").getBoundingClientRect(); const c = document.createElement("span");
@@ -410,7 +451,8 @@ async function renderCards() {
   $("cardS").src = lastStory._S.toDataURL("image/jpeg", .9); $("cardP").src = lastStory._P.toDataURL("image/jpeg", .9);
 }
 const K = { black: "#171917", silver: "#D9D9D9", yellow: "#E6F832", text: "#303030", off: "#F1F1F1" };
-function cover(x, img, X, Y, w, h) { const r = Math.max(w / img.width, h / img.height), sw = w / r, sh = h / r; x.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, X, Y, w, h); }
+let FX = .5, FY = .5; /* 這張卡的裁切重點（投稿時拖曳決定） */
+function cover(x, img, X, Y, w, h) { const r = Math.max(w / img.width, h / img.height), sw = w / r, sh = h / r; x.drawImage(img, (img.width - sw) * FX, (img.height - sh) * FY, sw, sh, X, Y, w, h); }
 function rr(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
 function lines(x, t, w, max) { const out = []; let l = ""; for (const ch of t) { if (x.measureText(l + ch).width > w && l) { out.push(l); l = ch; if (out.length === max) return out; } else l += ch; } if (l) out.push(l); return out.slice(0, max); }
 /* 標語組合：「挺好的」粗體＋黃底線、「，十年。」常規；下排 10 YEARS 粗、其餘常規灰 */
@@ -424,6 +466,7 @@ function slogan(x, X, Y, size, fg, sub) {
 function drawCard(img, s, W, H, style, B) {
   const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
   const tall = H > 1500, M = 72; x.textBaseline = "top";
+  FX = s.fx ?? .5; FY = s.fy ?? .5;
   const mono = (sz) => `500 ${sz}px 'JetBrains Mono', monospace`;
   const since = s.since === "忘記了" ? "" : ` · SINCE ${s.since}`;
   if (style === "A") {
@@ -471,11 +514,12 @@ function drawCard(img, s, W, H, style, B) {
     x.fillStyle = K.black; x.fillRect(0, 0, W, H);
     if (B.wmW) x.drawImage(B.wmW, M, M, 200, 200 * 155 / 591);
     x.font = mono(22); x.fillStyle = "rgba(255,255,255,.55)"; x.textAlign = "right"; x.fillText(pad(s.no), W - M, M + 12); x.textAlign = "left";
-    const pw = W - M * 2, ph = tall ? 900 : 540, py = M + 130;
+    /* 照片統一用正方形：限動滿寬；貼文（4:5）放大到最多、靠左，文字排右下 */
+    const py = M + (tall ? 130 : 100), side = tall ? W - M * 2 : 760, pw = side, ph = side;
     cover(x, img, M, py, pw, ph); x.strokeStyle = "rgba(255,255,255,.6)"; x.lineWidth = 2; x.strokeRect(M, py, pw, ph);
-    let ty = py + ph + (tall ? 90 : 54);
-    x.font = mono(24); x.fillStyle = "rgba(255,255,255,.55)"; x.fillText(`${s.name} · ${shortP(s.p)}${since}`, M, ty); ty += 56;
-    const fs = tall ? 72 : 58, lh = fs * 1.4; x.font = `700 ${fs}px 'Noto Sans TC'`; const L = lines(x, s.title, pw - (tall ? 0 : 170), 2);
+    let ty = py + ph + (tall ? 90 : 48);
+    x.font = mono(tall ? 24 : 22); x.fillStyle = "rgba(255,255,255,.55)"; x.fillText(`${s.name} · ${shortP(s.p)}${since}`, M, ty); ty += tall ? 56 : 44;
+    const fs = tall ? 72 : 52, lh = fs * 1.4; x.font = `700 ${fs}px 'Noto Sans TC'`; const L = lines(x, s.title, W - M * 2 - (tall ? 0 : 150), tall ? 2 : 1);
     x.fillStyle = "#fff"; L.forEach((l, i) => x.fillText(l, M, ty + i * lh));
     x.fillStyle = K.yellow; x.fillRect(M, ty + L.length * lh + 6, 64, 8);
     if (B.mkW) { const mw = tall ? 120 : 96; x.drawImage(B.mkW, W - M - mw, H - M - mw * 500 / 468 - (tall ? 0 : 4), mw, mw * 500 / 468); }
@@ -490,19 +534,27 @@ async function cardFiles() {
   return [new File([await b(lastStory._S)], `AlwaysBThere_${n}_story.jpg`, { type: "image/jpeg" }), new File([await b(lastStory._P)], `AlwaysBThere_${n}_post.jpg`, { type: "image/jpeg" })];
 }
 function download(file) { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
-const isTouch = matchMedia("(pointer:coarse)").matches;
-$("save").onclick = async () => {
-  const files = await cardFiles();
-  if (isTouch && navigator.canShare?.({ files })) { try { await navigator.share({ files }); toast("選「儲存影像」就能存進相簿"); return; } catch (e) { if (e.name === "AbortError") return; } }
-  files.forEach((f, i) => setTimeout(() => download(f), i * 400)); toast("故事卡已下載（限動＋貼文兩張）");
-};
-$("shareIg").onclick = async () => {
-  const [story] = await cardFiles();
-  const text = `${lastStory.title}｜${CFG.hashtag} ${CFG.igHandle}`;
-  try { await navigator.clipboard.writeText(text); } catch {}
-  if (navigator.canShare?.({ files: [story] })) { try { await navigator.share({ files: [story], text }); return; } catch (e) { if (e.name === "AbortError") return; } }
-  download(story); toast("故事卡已下載，打開 IG 發限動並 Tag @backbone.tw", 4200);
-  setTimeout(() => window.open(CFG.igUrl, "_blank", "noopener"), 900);
+/* iPhone/iPad 的網頁不能直接存進相簿，只能透過分享選單的「儲存影像」；Android 與電腦直接下載 */
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+async function saveFiles(files) {
+  if (isIOS && navigator.canShare?.({ files })) {
+    try { await navigator.share({ files }); toast("已儲存故事卡"); return; } catch (e) { if (e.name === "AbortError") { toast("在選單中點「儲存影像」，就會存進相簿", 3600); return; } }
+  }
+  files.forEach((f, i) => setTimeout(() => download(f), i * 400)); toast("已儲存故事卡（限動＋貼文兩張）");
+}
+$("save").onclick = async () => saveFiles(await cardFiles());
+/* 燈箱裡「你的故事」可以重新下載故事卡（只在投稿的那台裝置上出現） */
+$("lbDl").onclick = async () => {
+  const s0 = view[cur]; if (!s0 || !mineNos.has(s0.no)) return;
+  const btn = $("lbDl"); btn.disabled = true; const t0 = btn.textContent; btn.textContent = "產生中…";
+  try {
+    const im = await new Promise((res, rej) => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = rej; i.src = s0._local || imgSrc(s0, 1600); });
+    const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext("2d").drawImage(im, 0, 0);
+    const meta = (store.get("abt_mine_meta") || {})[s0.no] || {};
+    lastStory = { ...s0, fx: s0.fx ?? meta.fx, fy: s0.fy ?? meta.fy, _canvas: c, _S: null }; await renderCards();
+    await saveFiles(await cardFiles());
+  } catch { toast("故事卡產生失敗，請稍後再試"); }
+  finally { btn.disabled = false; btn.textContent = t0; }
 };
 
 /* ---------- Turnstile（有設定才載入） ---------- */

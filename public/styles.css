@@ -144,9 +144,9 @@ button{font:inherit;color:inherit}
 .search input:focus{outline:none}
 .search input::placeholder{color:var(--line2)}
 .search button{background:none;border:0;cursor:pointer;padding:6px;display:flex}
-.wall{columns:4;column-gap:28px}
-@media (max-width:1100px){.wall{columns:3}}
-@media (max-width:760px){.wall{columns:2;column-gap:14px}.filters{flex-direction:column;align-items:stretch}.sel select{width:100%}}
+.wall{display:flex;gap:28px;align-items:flex-start}
+.wall .col{flex:1 1 0;min-width:0;display:flex;flex-direction:column}
+@media (max-width:760px){.wall{gap:14px}.filters{flex-direction:column;align-items:stretch}.sel select{width:100%}}
 .card{break-inside:avoid;margin-bottom:28px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;background:none;border:0;padding:0;width:100%;font:inherit;color:inherit}
 .card .ph{width:100%;aspect-ratio:var(--ar,4/3);background:var(--silver);overflow:hidden;border:1px solid rgba(23,25,23,.08)}
 .card img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease),opacity .4s;opacity:0}
@@ -204,7 +204,7 @@ button{font:inherit;color:inherit}
 .field.bad :is(input,select,textarea){border-bottom-color:var(--err)!important}
 .field.inl .count-s{position:absolute;right:0;top:-14px}
 .field.blk{flex:1 1 100%;display:flex;flex-direction:column;gap:4px;position:relative}
-.field.blk textarea{font:inherit;font-weight:400;line-height:2;letter-spacing:.05em;min-height:68px;resize:none;border:0;border-bottom:1px solid rgba(23,25,23,.6);padding:0 4px;background:repeating-linear-gradient(transparent 0 calc(2em - 1px),rgba(23,25,23,.1) calc(2em - 1px) 2em);color:var(--black)}
+.field.blk textarea{font:inherit;font-weight:400;line-height:2;letter-spacing:.05em;min-height:6em;resize:none;background-attachment:local!important;border:0;border-bottom:1px solid rgba(23,25,23,.6);padding:0 4px;background:repeating-linear-gradient(transparent 0 calc(2em - 1px),rgba(23,25,23,.1) calc(2em - 1px) 2em);color:var(--black)}
 .count-s{align-self:flex-end;font-family:"Sora",sans-serif;font-size:9px;letter-spacing:.14em;color:var(--mute2);font-variant-numeric:tabular-nums}
 .count-s.full{color:var(--err)}
 .contact{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;padding-top:16px;border-top:1px solid rgba(23,25,23,.12)}
@@ -267,6 +267,7 @@ footer .f-mark{width:56px;height:auto;filter:invert(1)}
 .f-slogan{font-size:20px;letter-spacing:.14em;font-weight:400;display:flex;flex-direction:column;gap:6px}
 .f-slogan b{font-weight:700}
 .f-slogan .ul{box-shadow:inset 0 -.2em 0 var(--yellow)}
+.f-slogan .line{white-space:nowrap}
 .f-slogan small{font-family:"Sora",sans-serif;font-size:11px;letter-spacing:.24em;color:rgba(255,255,255,.55)}
 .f-slogan small b{color:#fff}
 footer nav{display:flex;gap:22px;font-size:12px;letter-spacing:.1em;color:rgba(255,255,255,.7);flex-wrap:wrap;justify-content:flex-end}
@@ -325,3 +326,17 @@ footer .mono{grid-column:1/-1;color:rgba(255,255,255,.4);border-top:1px solid rg
 @media (max-width:640px){#cardS{width:200px;height:auto}#cardP{width:120px;height:auto}}
 .toast{position:fixed;left:50%;bottom:max(28px,env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--black);color:#fff;font-size:12.5px;letter-spacing:.1em;padding:12px 18px;z-index:120;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ===== FINAL 修正（企劃 10/2 測試回饋） ===== */
+section[id],main [id="privacy"]{scroll-margin-top:80px}
+.sent-help{flex:1 1 100%;margin-top:-4px}
+.drop.has input{pointer-events:none}
+.drop.has img{cursor:grab;touch-action:none}
+.drop.has img.dragging{cursor:grabbing}
+.drop .drag-hint{position:absolute;left:8px;bottom:8px;background:rgba(23,25,23,.75);color:#fff;font-size:10px;letter-spacing:.1em;padding:5px 8px;display:none;pointer-events:none}
+.drop.has .drag-hint{display:block}
+.drop .swap{cursor:pointer;z-index:2}
+.igpost{text-decoration:underline;text-underline-offset:3px}
+.btn-ghost.igpost{text-decoration:none}
+.lb-act .mine-dl{display:none}
+.lb.mine .lb-act .mine-dl{display:inline-flex}
