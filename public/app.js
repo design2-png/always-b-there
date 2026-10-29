@@ -224,7 +224,15 @@ function startPile() {
   const mc = M.MouseConstraint.create(engine, { mouse, constraint: { stiffness: .15, render: { visible: false } } });
   /* 讓頁面照常捲動：拿掉 Matter 的滾輪與觸控攔截 */
   ["mousewheel", "DOMMouseScroll", "wheel"].forEach((ev) => mouse.element.removeEventListener(ev, mouse.mousewheel));
-  if (matchMedia("(pointer:coarse)").matches) { mouse.element.removeEventListener("touchmove", mouse.mousemove); mouse.element.removeEventListener("touchstart", mouse.mousedown); mouse.element.removeEventListener("touchend", mouse.mouseup); }
+  /* 手機：只有「手指按在泡泡上」才交給 Matter 拖曳，按在空白處照常捲頁 */
+  if (matchMedia("(pointer:coarse)").matches) {
+    mouse.element.removeEventListener("touchmove", mouse.mousemove); mouse.element.removeEventListener("touchstart", mouse.mousedown); mouse.element.removeEventListener("touchend", mouse.mouseup);
+    let grab = false;
+    el.addEventListener("touchstart", (e) => { if (!e.target.closest(".bub")) return; grab = true; e.preventDefault(); mouse.mousedown(e); }, { passive: false });
+    el.addEventListener("touchmove", (e) => { if (!grab) return; e.preventDefault(); mouse.mousemove(e); }, { passive: false });
+    const up = (e) => { if (!grab) return; grab = false; mouse.mouseup(e); };
+    el.addEventListener("touchend", up); el.addEventListener("touchcancel", up);
+  }
   M.World.add(engine.world, mc);
   runner = M.Runner.create(); M.Runner.run(runner, engine);
   M.Events.on(engine, "afterUpdate", () => { for (const b of bodies) b.el.style.transform = `translate(${(b.position.x - b.bw / 2).toFixed(1)}px,${(b.position.y - b.bh / 2).toFixed(1)}px) rotate(${b.angle.toFixed(3)}rad)`; });
