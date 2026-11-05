@@ -340,10 +340,12 @@ section[id],main [id="privacy"]{scroll-margin-top:calc(var(--logo-h, 22px) * 3 +
 .drop.has input{pointer-events:none}
 .drop.has img{cursor:grab;touch-action:none}
 .drop.has img.dragging{cursor:grabbing}
-.drop .drag-hint{position:absolute;left:8px;bottom:8px;background:rgba(23,25,23,.75);color:#fff;font-size:10px;letter-spacing:.1em;padding:5px 8px;display:none;pointer-events:none}
-.drop.has .drag-hint{display:block}
+.drop .drag-hint{position:absolute;left:8px;bottom:8px;display:none;align-items:center;gap:5px;background:rgba(23,25,23,.75);color:#fff;font-size:10px;letter-spacing:.1em;padding:5px 8px;display:none;pointer-events:none}
+.drop.has .drag-hint{display:inline-flex}
 .drop .swap{cursor:pointer;z-index:2}
 .igpost{text-decoration:underline;text-underline-offset:3px}
 .btn-ghost.igpost{text-decoration:none}
 .lb-act .mine-dl{display:none}
-.lb.mine .lb-act .mine-dl{display:inline-flex}
+.lb.mine .lb-act .mine-dl{display:flex}
+.lb-dl{flex-basis:100%;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:rgba(23,25,23,.05);border:1px dashed rgba(23,25,23,.25)}
+.lb-dl .chip{padding:7px 10px;font-size:10px}

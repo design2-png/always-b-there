@@ -103,7 +103,8 @@ function renderWall() {
 let lastCols = 0;
 function colCount() { const w = innerWidth; return w > 1100 ? 4 : w > 760 ? 3 : 2; }
 addEventListener("resize", () => { if (colCount() !== lastCols) renderWall(); });
-const shortP = (p) => String(p || "").replace(/[™®]/g, "").split(" ")[0].toUpperCase();
+/* 產品短名：去掉 ™®，只留中文說明前的英文部分（Kabuto NASA 限定版 → KABUTO NASA；Dyback 04 電動升降桌 → DYBACK 04） */
+const shortP = (p) => { const t = String(p || "").replace(/[™®]/g, "").trim(); const m = t.match(/^[A-Za-z0-9 .\-]+/); return (m ? m[0].trim() : t).toUpperCase(); };
 $("fProd").addEventListener("change", (e) => { fProd = e.target.value; applyFilter(); });
 let qT; $("q").addEventListener("input", (e) => { clearTimeout(qT); qT = setTimeout(() => { query = e.target.value; applyFilter(); }, 180); });
 $("searchForm").addEventListener("submit", (e) => { e.preventDefault(); query = $("q").value; applyFilter(); if (view.length === 1) openLb(0); });
@@ -142,11 +143,6 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeAll();
   if ($("lbov").classList.contains("on")) { if (e.key === "ArrowLeft" && cur > 0) openLb(cur - 1); if (e.key === "ArrowRight" && cur < view.length - 1) openLb(cur + 1); }
 });
-$("lbShare").onclick = async () => {
-  const s = view[cur]; const url = MODE === "api" ? `${location.origin}/s/${s.no}` : `${location.origin}${location.pathname}?s=${s.no}`;
-  try { if (navigator.share) { await navigator.share({ title: `「${s.title}」— Always B There`, url }); return; } } catch (e) { if (e.name === "AbortError") return; }
-  try { await navigator.clipboard.writeText(url); toast("連結已複製"); } catch { prompt("複製這個連結", url); }
-};
 document.querySelectorAll('a[href="#privacy"]').forEach((a) => a.addEventListener("click", () => { $("privacy").open = true; }));
 
 /* ---------- INTRO（滿版，播完才進主頁） ---------- */
@@ -292,7 +288,7 @@ async function decode(file) {
 async function loadPhoto(f) {
   if (!f) return;
   if (!/^image\//.test(f.type) && !/\.(heic|heif)$/i.test(f.name)) { toast("請上傳照片檔（JPG／PNG／HEIC）"); return; }
-  if (f.size > CFG.limits.photoMB * 1024 * 1024) { toast(`照片超過 ${CFG.limits.photoMB}MB，請換一張`); return; }
+  if (f.size > CFG.limits.photoMB * 1024 * 1024) { const mb = (f.size / 1048576).toFixed(1); bad("fPhoto", true, `這張照片 ${mb}MB，超過 ${CFG.limits.photoMB}MB 上限，請換一張`); toast(`照片超過 ${CFG.limits.photoMB}MB（這張 ${mb}MB），請換一張`, 4500); $("photo").value = ""; return; }
   let bmp;
   try { bmp = await decode(f); } catch { toast("這個格式在你的瀏覽器讀不出來，請改用 JPG 或 PNG", 4000); return; }
   const hash = await sha256(await f.arrayBuffer());
@@ -305,7 +301,8 @@ async function loadPhoto(f) {
   $("prev").src = photo.url; $("prev").style.objectPosition = "50% 50%"; drop.classList.add("has"); bad("fPhoto", false);
 }
 /* 拖曳照片調整位置（決定故事卡裁切的重點） */
-drop.addEventListener("click", (e) => { if (drop.classList.contains("has") && !e.target.closest(".swap")) e.preventDefault(); });
+/* 有照片後點圖片不再跳出選檔；「換一張」用程式觸發 input.click()，那個 click 會冒泡到這裡，要放行 */
+drop.addEventListener("click", (e) => { if (drop.classList.contains("has") && e.target !== $("photo") && !e.target.closest(".swap")) e.preventDefault(); });
 drop.querySelector(".swap").addEventListener("click", (e) => { e.preventDefault(); $("photo").click(); });
 drop.querySelector(".swap").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("photo").click(); } });
 (() => {
@@ -541,7 +538,7 @@ async function cardFiles() {
   if (!lastStory?._S) await renderCards();
   const b = (cv) => new Promise((r) => cv.toBlob(r, "image/jpeg", .92));
   const n = String(lastStory.no).padStart(4, "0");
-  return [new File([await b(lastStory._S)], `AlwaysBThere_${n}_story.jpg`, { type: "image/jpeg" }), new File([await b(lastStory._P)], `AlwaysBThere_${n}_post.jpg`, { type: "image/jpeg" })];
+  return [new File([await b(lastStory._S)], `AlwaysBThere_${n}_${cardStyle}_story.jpg`, { type: "image/jpeg" }), new File([await b(lastStory._P)], `AlwaysBThere_${n}_${cardStyle}_post.jpg`, { type: "image/jpeg" })];
 }
 function download(file) { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
 /* iPhone/iPad 的網頁不能直接存進相簿，只能透過分享選單的「儲存影像」；Android 與電腦直接下載 */
@@ -550,7 +547,7 @@ async function saveFiles(files) {
   if (isIOS && navigator.canShare?.({ files })) {
     try { await navigator.share({ files }); toast("已儲存故事卡"); return; } catch (e) { if (e.name === "AbortError") { toast("在選單中點「儲存影像」，就會存進相簿", 3600); return; } }
   }
-  files.forEach((f, i) => setTimeout(() => download(f), i * 400)); toast("已儲存故事卡（限動＋貼文兩張）");
+  files.forEach((f, i) => setTimeout(() => download(f), i * 400)); toast(`已儲存 ${cardStyle} 款故事卡（限動＋貼文兩張）`);
 }
 $("save").onclick = async () => saveFiles(await cardFiles());
 /* 燈箱裡「你的故事」可以重新下載故事卡（只在投稿的那台裝置上出現） */
@@ -561,11 +558,14 @@ $("lbDl").onclick = async () => {
     const im = await new Promise((res, rej) => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = rej; i.src = s0._local || imgSrc(s0, 1600); });
     const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext("2d").drawImage(im, 0, 0);
     const meta = (store.get("abt_mine_meta") || {})[s0.no] || {};
+    cardStyle = document.querySelector('[data-lbstyle][aria-pressed="true"]')?.dataset.lbstyle || "A";
     lastStory = { ...s0, fx: s0.fx ?? meta.fx, fy: s0.fy ?? meta.fy, _canvas: c, _S: null }; await renderCards();
     await saveFiles(await cardFiles());
   } catch { toast("故事卡產生失敗，請稍後再試"); }
   finally { btn.disabled = false; btn.textContent = t0; }
 };
+
+document.querySelectorAll("[data-lbstyle]").forEach((b) => b.addEventListener("click", () => document.querySelectorAll("[data-lbstyle]").forEach((x) => x.setAttribute("aria-pressed", x === b))));
 
 /* ---------- Turnstile（有設定才載入） ---------- */
 if (CFG.turnstileSiteKey) {
