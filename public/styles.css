@@ -347,5 +347,18 @@ section[id],main [id="privacy"]{scroll-margin-top:calc(var(--logo-h, 22px) * 3 +
 .btn-ghost.igpost{text-decoration:none}
 .lb-act .mine-dl{display:none}
 .lb.mine .lb-act .mine-dl{display:flex}
+/* 忘記儲存故事卡：只在「不是你的故事」時出現 */
+.recover{flex-basis:100%;margin-top:4px}
+.lb.mine .recover{display:none}
+.recover-link{background:none;border:0;padding:0;font:inherit;font-size:12px;letter-spacing:.06em;color:var(--mute);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.recover-link:hover{color:var(--black)}
+.recover-form{display:none;flex-direction:column;gap:8px;margin-top:8px;padding:12px;background:rgba(23,25,23,.05);border:1px dashed rgba(23,25,23,.25)}
+.recover.open .recover-form{display:flex}.recover.open .recover-link{display:none}
+.recover-form .help{margin:0;font-size:12px;line-height:1.7;color:var(--mute)}
+.recover-row{display:flex;gap:8px;flex-wrap:wrap}
+.recover-row input{flex:1 1 150px;min-width:0;font:inherit;font-size:14px;padding:8px 10px;border:1px solid rgba(23,25,23,.35);background:#fff;color:var(--black);border-radius:0}
+.recover-row input:focus{outline:none;border-color:var(--black)}
+.recover-form .err{display:none}.recover.bad .err{display:inline-block}
+@media (max-width:760px){.recover-row input{font-size:16px}}
 .lb-dl{flex-basis:100%;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:rgba(23,25,23,.05);border:1px dashed rgba(23,25,23,.25)}
 .lb-dl .chip{padding:7px 10px;font-size:10px}

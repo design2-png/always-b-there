@@ -241,6 +241,18 @@
       <div class="foot">
         <div class="lb-nav"><button class="navb mono" id="lbPrev">← 上一則</button><button class="navb mono" id="lbNext">下一則 →</button></div>
         <div class="lb-act"><div class="mine-dl lb-dl"><span class="chips" role="group" aria-label="故事卡樣式"><button class="chip" type="button" data-lbstyle="A" aria-pressed="true">A 海報</button><button class="chip" type="button" data-lbstyle="B" aria-pressed="false">B 牆</button><button class="chip" type="button" data-lbstyle="C" aria-pressed="false">C 黑</button></span><button class="btn-ghost sm" id="lbDl" type="button">下載我的故事卡</button></div><a class="btn-ghost sm igpost" href="#" target="_blank" rel="noopener">前往 IG 活動貼文 ↗</a><a class="btn sm" href="#submit" id="lbGo">我也要投稿 <i>→</i></a></div>
+        <div class="recover" id="recover">
+          <button type="button" class="recover-link" id="recoverBtn">忘記儲存故事卡？點我立即下載</button>
+          <form class="recover-form" id="recoverForm" autocomplete="on" novalidate>
+            <p class="help">這則故事是你投的嗎？輸入投稿時填的 Email 與手機，確認後就能下載故事卡。</p>
+            <div class="recover-row">
+              <input type="email" name="email" placeholder="Email" aria-label="Email" required>
+              <input type="tel" name="phone" inputmode="numeric" placeholder="手機 09xxxxxxxx" aria-label="手機" required>
+              <button class="btn sm" type="submit">確認</button>
+            </div>
+            <span class="err" id="recoverErr"></span>
+          </form>
+        </div>
       </div>
     </div>
   </div>

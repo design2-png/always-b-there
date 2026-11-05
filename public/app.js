@@ -123,6 +123,7 @@ function openLb(i) {
   $("lbText").textContent = `這十年，它${s.story}`;
   $("lbPrev").disabled = i === 0; $("lbNext").disabled = i >= view.length - 1;
   document.querySelector(".lb").classList.toggle("mine", mineNos.has(s.no));
+  $("recover").classList.remove("open", "bad");
   openOv("lbov", $("lbX"));
   history.replaceState(null, "", `?s=${s.no}${location.hash}`);
 }
@@ -565,6 +566,29 @@ $("lbDl").onclick = async () => {
   finally { btn.disabled = false; btn.textContent = t0; }
 };
 
+/* 忘記儲存故事卡：Email＋手機都對才認，成功後這組人投過的故事都標成「你的故事」 */
+$("recoverBtn").onclick = () => { $("recover").classList.add("open"); $("recoverForm").email.focus(); };
+$("recoverForm").onsubmit = async (e) => {
+  e.preventDefault(); const f = e.target, s0 = view[cur]; if (!s0) return;
+  const email = f.email.value.trim(), phone = f.phone.value.replace(/\D/g, "");
+  const fail = (m) => { $("recoverErr").textContent = m; $("recover").classList.add("bad"); };
+  $("recover").classList.remove("bad");
+  if (emailProblem(email)) return fail("Email 格式不對");
+  if (!/^09\d{8}$/.test(phone)) return fail("手機請輸入 09 開頭共 10 碼");
+  const btn = f.querySelector("button[type=submit]"); btn.disabled = true; const t0 = btn.textContent; btn.textContent = "確認中…";
+  try {
+    let nos;
+    if (MODE === "api") {
+      const r = await fetch("/api/mine", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ no: s0.no, email, phone }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return fail(j.message || "資料對不起來，請再確認一次");
+      nos = j.nos;
+    } else nos = [s0.no]; /* DEMO 模式沒有後台，直接放行 */
+    nos.forEach((n) => mineNos.add(n)); store.set("abt_mine", [...mineNos]);
+    $("recover").classList.remove("open"); f.reset(); renderWall(); openLb(cur); toast("找到了！現在可以下載你的故事卡");
+  } catch { fail("暫時無法查詢，請稍後再試"); }
+  finally { btn.disabled = false; btn.textContent = t0; }
+};
 document.querySelectorAll("[data-lbstyle]").forEach((b) => b.addEventListener("click", () => document.querySelectorAll("[data-lbstyle]").forEach((x) => x.setAttribute("aria-pressed", x === b))));
 
 /* ---------- Turnstile（有設定才載入） ---------- */
