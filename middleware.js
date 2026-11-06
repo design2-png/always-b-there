@@ -33,6 +33,7 @@ export default function middleware(request) {
     return;                                                                // 正常放行
   }
   if (path === "/wait" || path === "/wait.html") return;
+  if (path === "/api/stories") return;                                     // 公開的故事數（十週年主站要顯示），開站前也放行
   if (path.startsWith("/api/")) return new Response(JSON.stringify({ ok: false, error: "not_open" }), { status: 403, headers: { "content-type": "application/json; charset=utf-8" } });
   return rewrite(new URL("/wait", url));
 }
