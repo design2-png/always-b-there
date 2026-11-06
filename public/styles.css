@@ -173,6 +173,7 @@ button{font:inherit;color:inherit}
 .sub-l{display:flex;flex-direction:column;gap:22px;position:relative}
 .sub-l h2{margin:0;font-size:clamp(26px,3vw,34px);line-height:1.5;font-weight:500;letter-spacing:.06em}
 .sub-l .spine{width:96px;height:auto;margin-top:12px}
+.sub-l .sub-p{margin:-6px 0 0;font-size:14px;line-height:2;font-weight:300;letter-spacing:.06em;color:var(--mute)}
 .story-form{position:relative;display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px 36px;align-items:start;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.9);padding:clamp(22px,3vw,36px);box-shadow:0 30px 60px -30px rgba(23,25,23,.3)}
 .story-form #fPhoto{grid-row:1/3}
 .story-form .contact,.story-form .agree,.story-form .send,.story-form #turnstile,.story-form .closed-note{grid-column:1/-1}

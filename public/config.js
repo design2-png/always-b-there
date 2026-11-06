@@ -17,11 +17,11 @@
   /* 社群 */
   igHandle: "@backbone.tw",
   igUrl: "https://www.instagram.com/backbone.tw/",
-  igPostUrl: "", /* 活動貼文網址，上線後填入；留空就不顯示「前往活動貼文」 */
+  igPostUrl: "https://www.instagram.com/p/DfYloZhk5Yj/", /* 活動貼文網址；留空會改連 IG 首頁 */
   hashtag: "#AlwaysBThere",
 
   /* 連結 */
-  mainSite: "https://design2-png.github.io/10THanniversary/",
+  mainSite: "https://10th.backbone.tw/",
   shopUrl: "https://www.backbone.tw/",
 
   /* Cloudflare Turnstile 防機器人（選用）：填 site key 即啟用，後端要同時設 TURNSTILE_SECRET */
